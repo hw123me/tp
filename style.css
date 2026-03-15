@@ -1,0 +1,197 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css");
+@import url("https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css");
+* {
+  font-family: "Tajawal", sans-serif;
+}
+/* 1. الإعدادات العامة للجسم (Global Styles) */
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fdfdfd;
+  /* إضافة نقاط صغيرة جداً تعطي فخامة للورق الرسمي */
+  background-image: radial-gradient(#d1d5db 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* 2. النافبار والفوتر (Header & Footer) */
+.custom-navbar, .custom-footer {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%) !important;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 0;
+}
+
+.custom-footer {
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: auto; /* يضمن بقاء الفوتر في الأسفل */
+}
+
+/* اسم المطور بالتدرج الذهبي */
+.developer-name {
+  background: linear-gradient(to bottom, #fcf6ba 0%, #bf953f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.05rem;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.developer-name:hover {
+  filter: brightness(1.2);
+  cursor: pointer;
+}
+
+/* 3. البطاقات (Cards) */
+.card {
+ background-color: #ffffff;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* بطاقات الإحصائيات الملونة */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  padding: 1.5rem;
+  color: white;
+}
+
+.card-blue { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+.card-green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+
+.bg-icon {
+  position: absolute;
+  left: -10px;
+  bottom: -10px;
+  font-size: 5rem;
+  opacity: 0.15;
+  transform: rotate(-15deg);
+  color: #fff;
+}
+
+/* 4. الجداول (Tables) */
+.table-responsive {
+  border-radius: 10px;
+}
+
+/* تنسيق الهيدر المتدرج للأزرق */
+.blue-gradient-header th {
+  background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 12px 8px !important;
+  border: none !important;
+  text-align: center;
+}
+
+/* تنسيق الجداول المخصصة (نتائج البحث) */
+.custom-table tbody tr:nth-child(even) { background-color: #f4f7fa; }
+.custom-table tbody tr:hover {
+  background-color: #ebf2ff !important;
+  transform: scale(1.005);
+  transition: 0.2s;
+}
+
+/* شريط التمرير (Scrollbars) */
+.scrollable-table-container::-webkit-scrollbar,
+#usersDetailsModal .table-responsive::-webkit-scrollbar,
+#fullStatsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-table-container::-webkit-scrollbar-thumb { background-color: #ffc107; border-radius: 10px; }
+#usersDetailsModal .table-responsive::-webkit-scrollbar-thumb { background-color: #dee2e6; border-radius: 10px; }
+
+/* 5. الحالات والمؤشرات (Indicators & States) */
+.indicator-box {
+  border-right: 4px solid #0d6efd;
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.is-featured {
+  background-color: #ffc107 !important;
+  color: #fff !important;
+}
+
+.indicator-completed {
+  background-color: #f8fff9 !important;
+  border-right: 5px solid #198754 !important;
+}
+
+/* 6. الحركات (Animations) */
+.bi-spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.transition-hover {
+  transition: all 0.3s ease;
+}
+
+.transition-hover:hover {
+  transform: translateY(-2px);
+  border-color: #0d6efd !important;
+}
+
+/* أيقونات الأسهم والدوران */
+.transition-icon {
+  transition: transform 0.3s ease;
+}
+
+[aria-expanded="false"] .transition-icon {
+  transform: rotate(-90deg);
+}
+#userInfoContainer.d-flex {
+    display: flex !important;
+    animation: fadeInRight 0.5s ease;
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.cursor-pointer:hover span#userInfo {
+    text-decoration: underline;
+    color: #ffc107;
+}
+/* تأثير نبض للحاوية أثناء التحميل */
+#evidenceContainer:has(.spinner-grow) {
+    border: 2px dashed #e9ecef;
+    background-color: #fafbfc;
+    animation: pulseBG 2s infinite;
+}
+
+@keyframes pulseBG {
+    0% { background-color: #fafbfc; }
+    50% { background-color: #f0f7ff; }
+    100% { background-color: #fafbfc; }
+}

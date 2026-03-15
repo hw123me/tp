@@ -1,0 +1,1333 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم - إدارة الشواهد</title>
+    <link rel="stylesheet" href="style.css" />
+     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-dark custom-navbar mb-4 shadow-sm py-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-bottom: 3px solid #ffc107;">
+    <div class="container d-flex justify-content-between align-items-center">
+        
+        <div class="d-flex align-items-center gap-3 order-1">
+            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm border border-2 border-white"
+                 style="width: 50px; height: 50px; min-width: 50px;">
+                <i class="bi bi-collection-fill fs-4"></i>
+            </div>
+            <div class="text-white">
+                <h5 class="fw-bold mb-0" style="letter-spacing: 0.5px;">إدارة الشواهد التعليمية</h5>
+                <div class="d-none d-md-block" style="font-size: 0.75rem; opacity: 0.85;">
+                    مجمع الإمام يعقوب البصري وأبو عمرو البصري
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 order-2">
+            <div id="userInfoContainer" class="hidden align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-white border-opacity-25">
+                <div class="text-white me-3 d-flex flex-column text-end cursor-pointer" onclick="openEditProfile()" style="cursor: pointer;">
+                    <span class="small opacity-75" style="font-size: 0.65rem;">مرحباً بك</span>
+                    <span id="userInfo" class="fw-bold small"></span>
+                </div>
+                <button onclick="handleLogout()" class="btn btn-sm btn-light rounded-circle shadow-sm text-danger d-flex align-items-center justify-content-center" 
+                        style="width: 32px; height: 32px;" title="تسجيل الخروج">
+                    <i class="bi bi-power"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    </nav>
+
+    <div id="adminDashboard" class="container mb-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark fw-bold mb-0">
+          <i class="bi bi-shield-lock"></i> لوحة الإشراف العام
+        </h3>
+        <button onclick="refreshAdminData()" class="btn btn-outline-primary btn-sm shadow-sm">
+            <i class="bi bi-arrow-clockwise" id="refreshIcon"></i> تحديث البيانات
+        </button>
+      </div>
+      <div class="row mb-4 g-3">
+  <div class="col-md-3">
+    <div class="stat-card card-blue" onclick="showUsersDetails()" style="cursor: pointer;">
+      <i class="bi bi-people bg-icon"></i>
+      <span class="stat-label">إجمالي المستخدمين</span>
+      <h2 class="stat-value" id="statUsers">0</h2>
+      <span class="stat-subtext">انقر لعرض التفاصيل</span>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="stat-card card-green">
+      <i class="bi bi-file-earmark-arrow-up bg-icon"></i>
+      <span class="stat-label">إجمالي الملفات</span>
+      <h2 class="stat-value" id="statFiles">0</h2>
+      <span class="stat-subtext">ملفاً مرفوعاً حتى الآن</span>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card p-3 h-100 shadow-sm border-0 rounded-4">
+      <h6 class="text-muted small fw-bold mb-3"><i class="bi bi-pie-chart-fill me-1"></i> توزيع الأدوار الوظيفية</h6>
+      <div style="height: 140px;">
+        <canvas id="rolesChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+      <h5 class="text-primary fw-bold mt-2"><i class="bi bi-person-search"></i> آخر الشواهد المرفوعة </h5>
+
+      <div class="card p-0 mt-3 overflow-hidden shadow-sm border-0">
+        <table class="table table-sm table-striped small mb-0">
+          <thead class="blue-gradient-header">
+            <tr>
+              <th>الموظف</th>
+              <th>الشاهد</th>
+              <th>الملف</th>
+              <th>عرض</th>
+            </tr>
+          </thead>
+          <tbody id="recentFilesBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-5 border-top pt-2">
+
+      </div>
+
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-middle">
+          <h6 class="mb-0"><i class="bi bi-bar-chart-fill"></i> إحصائيات إنجاز الموظفين </h6>
+        </div>
+        <div class="card-body">
+          <div id="statsContainer" class="row row-cols-1 row-cols-md-2 g-2">
+          </div>
+
+          <div class="text-center mt-3">
+            <button class="btn btn-sm btn-link text-decoration-none" onclick="showAllStats()">
+                عرض ترتيب جميع الموظفين <i class="bi bi-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+     <div class="modal fade" id="allStatsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-trophy-fill me-2 text-warning"></i> ترتيب إنجاز الموظفين
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-0 bg-light">
+        <div class="p-3 text-center bg-white border-bottom small text-muted">
+          يتم الترتيب بناءً على إجمالي عدد الشواهد المرفوعة لكل موظف
+        </div>
+        
+        <div style="max-height: 500px; overflow-y: auto;">
+          <ul id="fullStatsList" class="list-group list-group-flush shadow-sm">
+            </ul>
+        </div>
+      </div>
+      
+      <div class="modal-footer bg-white border-0 py-2">
+        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4" data-bs-dismiss="modal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+      
+      <h5 class="text-warning fw-bold mb-3">
+        <i class="bi bi-star-fill"></i> لوحة الشواهد المميزة
+      </h5>
+
+      <div class="scrollable-table-container bg-white shadow-sm rounded border">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="sticky-top gold-gradient-header">
+              <tr>
+                <th>الموظف</th>
+                <th>الشاهد</th>
+                <th>الملف</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="featuredTableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mt-5 border-top pt-2">
+      </div>
+
+      <h5 class="text-primary fw-bold mt-2"><i class="bi bi-person-search"></i> استعراض حسب الموظف</h5>
+      <div class="card p-4 mb-5 shadow-sm border-0">
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <input type="text" id="userSearchInput" class="form-control" placeholder="اكتب اسم الموظف للبحث..." onkeyup="filterUserList()">
+        </div>
+
+        <select id="userSel" class="form-select mb-3" 
+              onchange="viewStaff(this.value, this.options[this.selectedIndex].text)">
+            <option value="">-- اختر موظفاً لاستعراض شواهده --</option>
+        </select>
+
+        <div id="adminViewArea"></div>
+      </div>
+
+
+
+      <h5 class="text-primary fw-bold mt-2"><i class="bi bi-person-search"></i> بحث مخصص (موظف + شاهد)</h5>
+      <div class="card p-4 mb-5 bg-white shadow-sm border-0">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="small fw-bold mb-1">اسم الموظف:</label>
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-filter"></i></span>
+              <input type="text" id="advUserSearchInput" class="form-control border-start-0" placeholder="ابحث عن اسم..." onkeyup="filterAdvUserList()">
+            </div>
+            <select id="advUserSel" class="form-select" onchange="updateAdvCatList()">
+                <option value="">-- اختر الموظف من القائمة --</option>
+            </select>
+          </div>
+
+          <div class="col-md-5">
+            <label class="small fw-bold mb-1">الشاهد المستهدف:</label>
+            <div class="mb-2" style="height: 31px;"></div> <select id="advCatSel" class="form-select">
+                <option value="">-- اختر الشاهد --</option>
+            </select>
+          </div>
+
+          <div class="col-md-3 d-flex align-items-end">
+            <button onclick="searchByUserAndCat()" class="btn btn-primary w-100 shadow-sm py-2">
+                <i class="bi bi-search me-1"></i> استعراض الملفات
+            </button>
+          </div>
+        </div>
+
+        <div id="advSearchResults" class="mt-4 hidden animate__animated animate__fadeIn">
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+            <h6 class="mb-0 text-secondary small">نتائج البحث في الشاهد المختار:</h6>
+            <span id="resultCount" class="badge bg-secondary">0 ملف</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>الملف </th>
+                  <th class="text-center" style="width: 80px;">معاينة</th>
+                </tr>
+              </thead>
+              <tbody id="advResBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 border-top pt-2">
+      </div>
+    </div>
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true" dir="rtl">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">تعديل الملف الشخصي</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm">
+          <div class="mb-3 text-end">
+            <label class="form-label small fw-bold">البريد الإلكتروني (لا يمكن تغييره)</label>
+            <input type="text" id="editEmail" class="form-control bg-light" readonly>
+          </div>
+          <div class="mb-3 text-end">
+            <label class="form-label small fw-bold">الاسم الكامل</label>
+            <input type="text" id="editFullName" class="form-control" required>
+          </div>
+          <div class="mb-3 text-end">
+            <label class="form-label small fw-bold">كلمة المرور الجديدة</label>
+            <input type="password" id="editPassword" class="form-control" placeholder="اتركها فارغة إذا لم ترد تغييرها">
+          </div>
+          <div id="editStatus"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="saveProfileChanges()" id="saveProfileBtn">حفظ التغييرات</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ <div class="modal fade" id="usersDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header text-white rounded-top-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+        <h5 class="modal-title fw-bold"><i class="bi bi-people-fill me-2"></i> قائمة المستخدمين المسجلين</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body p-0">
+        <div class="p-3 bg-light border-bottom">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0" id="userModalSearch" placeholder="بحث سريع عن اسم..." onkeyup="filterModalUsers()">
+            </div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+          <table class="table table-hover align-middle mb-0" id="modalUsersTable">
+            <thead class="sticky-top bg-white">
+              <tr class="text-secondary small fw-bold">
+                <th class="px-4 py-3 border-0">الاسم الكامل</th>
+                <th class="text-center py-3 border-0">الدور الوظيفي</th>
+              </tr>
+            </thead>
+            <tbody id="usersDetailsBody">
+              </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="modal-footer bg-light py-2 rounded-bottom-4">
+        <small class="text-muted" id="modalUserCount">إجمالي: 0 مستخدم</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade" id="staffModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-folder-check me-2"></i> استعراض شواهد الموظف
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small">الموظف:</span>
+          <span id="currentStaffName" class="fw-bold text-primary ms-1">---</span>
+        </div>
+        <span id="staffFilesCount" class="badge bg-white text-primary border shadow-sm rounded-pill px-3">0 ملف</span>
+      </div>
+
+      <div class="modal-body p-0">
+        <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="sticky-top bg-white shadow-sm">
+              <tr class="small text-muted text-uppercase">
+                <th class="ps-4 py-3">التصنيف (الشاهد)</th>
+                <th class="py-3">اسم الملف المرفوع</th>
+                <th class="text-center py-3" style="width: 120px;">الإجراء</th>
+              </tr>
+            </thead>
+            <tbody id="staffFilesBody">
+              </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <footer class="custom-footer text-white mt-auto py-3" style="background: #1e3c72;">
+        <div class="container text-center">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-md-start mb-3 mb-md-0 opacity-75">
+                    <small>جميع الحقوق محفوظة &copy; 2026</small>
+                </div>
+                <div class="col-md-8 text-md-end">
+                    <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 small">
+                        <span><i class="bi bi-lightbulb-fill text-warning me-1"></i>فكرة: <b>خالد المالكي</b></span>
+                        <span><i class="bi bi-code-slash text-info me-1"></i>تطوير: <b>عبدالرزاق المعلوي</b></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDWhOi8f6E_3loRb9cwfk2kczplaeSFUau18eg42o6pCXPNR_fMYdo_EtqVcy1wNc/exec";
+        const role = localStorage.getItem("userRole");
+        const userID = localStorage.getItem("userEmail");
+
+        function displayUserInfo() {
+            const userName = localStorage.getItem("userName");
+            const userRole = localStorage.getItem("userRole");
+            if (userName && userRole) {
+                const container = document.getElementById("userInfoContainer");
+                document.getElementById("userInfo").textContent = `${userName} (${userRole})`;
+                container.classList.remove("hidden");
+            }
+        }
+
+      
+        async function deleteFile(fileId, btnElement) {
+            if (!confirm("هل تريد حذف هذا الملف؟")) return;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "deleteFile", fileId: fileId, username: userID }),
+                });
+                const result = await response.json();
+                if (result.status === "success") loadEvidence();
+                else alert("فشل الحذف");
+            } catch (e) {
+                alert("خطأ في الاتصال");
+                btnElement.disabled = false;
+            }
+        }
+
+        function handleLogout() { localStorage.clear(); window.location.href = "index.html"; }
+        // فتح نافذة التعديل وتعبئة البيانات الحالية
+function openEditProfile() {
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail"); // userID
+
+    document.getElementById("editEmail").value = userEmail;
+    document.getElementById("editFullName").value = userName;
+    document.getElementById("editPassword").value = ""; // يبقى فارغاً للأمان
+    document.getElementById("editStatus").innerHTML = "";
+
+    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    modal.show();
+}
+
+// إرسال التحديثات إلى Google Apps Script
+async function saveProfileChanges() {
+    const fullName = document.getElementById("editFullName").value;
+    const password = document.getElementById("editPassword").value;
+    const email = document.getElementById("editEmail").value;
+    const btn = document.getElementById("saveProfileBtn");
+    const status = document.getElementById("editStatus");
+
+    if (!fullName) {
+        status.innerHTML = "<div class='alert alert-warning py-1 small'>يرجى إدخال الاسم</div>";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> جاري الحفظ...`;
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "updateProfile",
+                email: email,
+                fullName: fullName,
+                password: password // سيتم تحديثها فقط إذا لم تكن فارغة في السيرفر
+            }),
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            // تحديث البيانات في التخزين المحلي للمتصفح
+            localStorage.setItem("userName", fullName);
+            
+            status.innerHTML = "<div class='alert alert-success py-1 small'>✅ تم تحديث البيانات بنجاح</div>";
+            
+            // تحديث واجهة المستخدم فوراً
+            displayUserInfo();
+            
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+                btn.disabled = false;
+                btn.innerHTML = "حفظ التغييرات";
+            }, 1500);
+        } else {
+            status.innerHTML = `<div class='alert alert-danger py-1 small'>❌ ${result.message}</div>`;
+            btn.disabled = false;
+            btn.innerHTML = "حفظ التغييرات";
+        }
+    } catch (error) {
+        status.innerHTML = "<div class='alert alert-danger py-1 small'>❌ حدث خطأ في الاتصال</div>";
+        btn.disabled = false;
+        btn.innerHTML = "حفظ التغييرات";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+            displayUserInfo();
+            refreshStats();
+            getRecentFiles(); 
+            loadStaffStats();
+            refreshFeaturedList();
+            populateUserSelect();
+            populateAdvUserSelect();
+});
+async function showUsersDetails() {
+    const body = document.getElementById('usersDetailsBody');
+    const countLabel = document.getElementById('modalUserCount');
+    body.innerHTML = '<tr><td colspan="2" class="text-center p-5"><div class="spinner-grow text-primary" role="status"></div><div class="mt-2 small text-muted">جاري ترتيب القائمة...</div></td></tr>';
+    
+    // إظهار المودال
+    const modal = new bootstrap.Modal(document.getElementById('usersDetailsModal'));
+    modal.show();
+    
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getAllUsers" })
+        });
+        const users = await response.json();
+        
+        body.innerHTML = '';
+        countLabel.textContent = `إجمالي: ${users.length} مستخدم`;
+
+        users.forEach(user => {
+            // تحديد لون الأيقونة بناءً على الدور
+            let roleBadge = "";
+            switch(user.role) {
+                case 'أدمن': roleBadge = 'bg-danger'; break;
+                case 'معلم': roleBadge = 'bg-primary'; break;
+                case 'وكيل': roleBadge = 'bg-success'; break;
+                default: roleBadge = 'bg-secondary';
+            }
+
+            body.innerHTML += `
+                <tr>
+                    <td class="px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm-circle bg-light text-primary me-3 d-flex align-items-center justify-content-center rounded-circle" style="width:35px; height:35px; min-width:35px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <span class="fw-bold text-dark">${user.fullname}</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge ${roleBadge} bg-opacity-10 text-${roleBadge.replace('bg-', '')} border border-${roleBadge.replace('bg-', '')}-subtle px-3 py-2 rounded-pill shadow-xs" style="font-size: 0.75rem;">
+                            ${user.role}
+                        </span>
+                    </td>
+                </tr>`;
+        });
+    } catch (error) {
+        body.innerHTML = '<tr><td colspan="2" class="text-center text-danger p-4 small">❌ فشل تحميل البيانات</td></tr>';
+    }
+}
+
+// دالة البحث السريع داخل المودال
+function filterModalUsers() {
+    let input = document.getElementById('userModalSearch').value.toLowerCase();
+    let rows = document.querySelectorAll('#modalUsersTable tbody tr');
+    rows.forEach(row => {
+        let name = row.querySelector('span.fw-bold').textContent.toLowerCase();
+        row.style.display = name.includes(input) ? '' : 'none';
+    });
+}
+ 
+let rolesChart; // متغير عالمي للمخطط
+
+async function refreshStats() {
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getStats" })
+        });
+        const stats = await response.json();
+
+        if (stats.status === "success") {
+            // تحديث الأرقام (تأثير تصاعدي بسيط)
+            animateCounter('statUsers', stats.totalUsers);
+            animateCounter('statFiles', stats.totalFiles);
+
+            // تحديث الرسم البياني
+            updateRolesChart(stats.roles);
+        }
+    } catch (error) { console.error("Stats Error:", error); }
+}
+
+// دالة تحديث الرسم البياني
+function updateRolesChart(rolesData) {
+    const ctx = document.getElementById('rolesChart').getContext('2d');
+    const labels = Object.keys(rolesData);
+    const data = Object.values(rolesData);
+
+    if (rolesChart) rolesChart.destroy(); // حذف المخطط القديم قبل رسم الجديد
+
+    rolesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#1e3c72', '#11998e', '#f39c12', '#e74c3c', '#9b59b6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+// دالة عداد الأرقام
+function animateCounter(id, target) {
+    let current = 0;
+    const obj = document.getElementById(id);
+    const step = Math.ceil(target / 20); 
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            obj.innerText = target;
+            clearInterval(timer);
+        } else {
+            obj.innerText = current;
+        }
+    }, 30);
+}
+
+function refreshAdminData() {
+    // 1. إضافة تأثير الدوران للأيقونة
+    const icon = document.getElementById('refreshIcon');
+    icon.classList.add('bi-spin'); // سنضيف تنسيق هذا الكلاس في الـ CSS
+
+    // 2. إعادة استدعاء كافة دوال البيانات
+    refreshStats();         // تحديث الإحصائيات والأدوار
+    getRecentFiles();       // تحديث جدول الشواهد الأخير
+    refreshFeaturedList();  // تحديث الشواهد المميزة
+    populateAdvUserSelect();       // تحديث جدول الموظفين والقائمة المنسدلة
+    loadStaffStats();       // تحديث إحصائيات إنجاز الموظفين
+    
+    // 3. إزالة تأثير الدوران بعد ثانية واحدة (إيحاء بالتحميل)
+    setTimeout(() => {
+        icon.classList.remove('bi-spin');
+    }, 1000);
+}
+async function getRecentFiles() {
+    const body = document.getElementById('recentFilesBody');
+    if (!body) return;
+
+    // إظهار مؤشر تحميل متوافق مع مظهر الجدول
+    body.innerHTML = `
+        <tr>
+            <td colspan="4" class="text-center p-5">
+                <div class="spinner-border text-primary mb-2" role="status"></div>
+                <div class="text-muted small">جاري تحديث قائمة الشواهد...</div>
+            </td>
+        </tr>`;
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getRecentFiles" })
+        });
+
+        const files = await response.json();
+        body.innerHTML = ''; 
+
+        if (!files || files.length === 0) {
+            body.innerHTML = '<tr><td colspan="4" class="text-center p-5 text-muted"><i class="bi bi-folder2-open d-block fs-2 mb-2"></i> لا توجد شواهد مرفوعة حالياً</td></tr>';
+            return;
+        }
+
+        files.forEach(f => {
+            // تجهيز البيانات لدالة التمييز
+            const fileData = JSON.stringify(f).replace(/"/g, '&quot;');
+            
+            // حالة التمييز (نجمة)
+            const btnClass = f.isFeatured ? 'btn-warning' : 'btn-light';
+            const iconClass = f.isFeatured ? 'bi-star-fill text-white' : 'bi-star text-warning';
+            
+            // التحقق من اسم الملف: إذا كان مخزناً كرابط كامل نأخذ جزءاً منه، أو نستخدم الاسم المخزن
+            const displayFileName = f.fileName.length > 30 ? "عرض الملف المرفق" : f.fileName;
+
+            body.innerHTML += `
+                <tr class="align-middle">
+                    <td class="text-center py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center ms-2" style="width:32px; height:32px;">
+                                <i class="bi bi-person-fill small"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold mb-0" style="font-size: 0.85rem; text-align: center;">${f.fullName}</div>
+                                <div class="text-muted" style="font-size: 0.7rem; text-align: center;">${f.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-info-subtle text-dark border border-info-subtle px-2 fw-normal" style="font-size: 0.75rem; text-align: center;">
+                            ${f.category}
+                        </span>
+                    </td>
+                    <td>
+                     <div class="d-flex align-items-center justify-content-center text-muted" style="font-size: 0.8rem;">
+                            <i class="bi bi-link-45deg ms-1"></i>
+                            <span class="text-truncate" style="max-width: 120px;" title="${f.fileName}">
+                                ${displayFileName}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group shadow-sm border rounded-2 bg-white">
+                            <a href="https://drive.google.com/file/d/${f.fileId}/view" 
+                               target="_blank" 
+                               class="btn btn-sm btn-white border-0 py-1" 
+                               title="معاينة">
+                                <i class="bi bi-eye text-primary"></i>
+                            </a>
+                            <button id="btn_${f.fileId}" 
+                                    onclick="markAsFeatured(${fileData}, 'btn_${f.fileId}')" 
+                                    class="btn btn-sm border-0 py-1 ${btnClass}" 
+                                    title="تمييز">
+                                <i class="bi ${iconClass}"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        body.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-danger small">❌ تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً</td></tr>';
+    }
+
+    
+}
+
+let allStatsData = [];
+async function loadStaffStats() {
+    const container = document.getElementById('statsContainer');
+    if (!container) return;
+
+    // إظهار مؤشر تحميل هادئ
+    container.innerHTML = `
+        <div class="text-center w-100 p-3">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+            <span class="text-muted small">جاري تحليل بيانات الموظفين...</span>
+        </div>`;
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getStaffStats" })
+        });
+
+        const result = await response.json();
+        allStatsData = result.statsList || [];
+        // الوصول للمصفوفة داخل الكائن المرسل من الباك إند
+        const stats = result.statsList; 
+        
+        container.innerHTML = '';
+
+        if (!stats || stats.length === 0) {
+            container.innerHTML = '<p class="text-center w-100 text-muted small py-3">لا توجد إحصائيات رفع متاحة حالياً</p>';
+            return;
+        }
+
+        // عرض أعلى 10 موظفين
+        stats.slice(0, 10).forEach((item, index) => {
+            // ألوان خاصة للمراكز الثلاثة الأولى
+            const badgeClass = index === 0 ? 'bg-warning text-dark' : // الأول (ذهبي)
+                               index === 1 ? 'bg-secondary-subtle text-dark' : // الثاني (فضي)
+                               index === 2 ? 'bg-danger-subtle text-danger' : // الثالث (برونزي)
+                               'bg-light text-muted'; // البقية
+
+           container.innerHTML += `
+    <div class="col-12 mb-2 w-100"> 
+        <div class="d-flex justify-content-between align-items-center p-3 bg-white border rounded-3 shadow-sm transition-hover w-100">
+            <div class="d-flex align-items-center flex-grow-1">
+                <span class="badge ${badgeClass} rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm" 
+                      style="width: 30px; height: 30px; font-size: 0.85rem; min-width: 30px;">
+                    ${index + 1}
+                </span>
+                <div class="d-flex flex-column">
+                    <span class="text-dark fw-bold" style="font-size: 0.95rem;">${item.fullName}</span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-4 py-2" 
+                      style="font-size: 0.85rem; min-width: 100px;">
+                    <span class="fw-bold">${item.count}</span> 
+                    <i class="bi bi-file-earmark-check ms-1"></i>
+                </span>
+            </div>
+        </div>
+    </div>`;
+        });
+
+    } catch (error) {
+        console.error("Stats Error:", error);
+        container.innerHTML = '<div class="alert alert-danger small m-2 text-center">❌ خطأ في جلب الإحصائيات</div>';
+    }
+}
+
+// دالة عرض القائمة الكاملة في المودال
+function showAllStats() {
+    const list = document.getElementById('fullStatsList');
+    list.innerHTML = '';
+
+    if (allStatsData.length === 0) {
+        list.innerHTML = `
+            <div class="text-center p-5 text-muted">
+                <i class="bi bi-clipboard-x fs-1 d-block mb-2"></i>
+                لا توجد بيانات حالياً
+            </div>`;
+    } else {
+        allStatsData.forEach((item, index) => {
+            // تخصيص أيقونات وألوان للمراكز الثلاثة الأولى
+            let rankIcon = '';
+            let rankColor = '';
+            let bgClass = 'bg-white';
+
+            if (index === 0) {
+                rankIcon = '<i class="bi bi-award-fill text-warning fs-4"></i>'; // ذهبي
+                bgClass = 'bg-warning bg-opacity-10';
+            } else if (index === 1) {
+                rankIcon = '<i class="bi bi-award-fill text-secondary fs-4"></i>'; // فضي
+            } else if (index === 2) {
+                rankIcon = '<i class="bi bi-award-fill text-danger fs-4"></i>'; // برونزي (نحاسي)
+            } else {
+                rankIcon = `<span class="badge bg-light text-dark rounded-circle border shadow-sm">${index + 1}</span>`;
+            }
+
+            list.innerHTML += `
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom ${bgClass} transition-hover">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 d-flex justify-content-center align-items-center" style="width: 40px;">
+                            ${rankIcon}
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">${item.fullName}</div>
+                            <small class="text-muted" style="font-size: 0.7rem;"> </small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge rounded-pill px-3 py-2 bg-primary">
+                            <i class="bi bi-file-earmark-check me-1"></i> ${item.count} ملف
+                        </span>
+                    </div>
+                </li>`;
+        });
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('allStatsModal'));
+    modal.show();
+}
+async function markAsFeatured(fileObj, btnId) {
+    const btn = document.getElementById(btnId);
+    const icon = btn.querySelector('i');
+    
+    // حفظ الحالة الأصلية
+    btn.disabled = true;
+    const originalIconClass = icon.className;
+    icon.className = 'spinner-border spinner-border-sm text-warning';
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ 
+                action: "toggleFeatured", 
+                fileData: fileObj 
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            if (result.mode === "added") {
+                btn.className = 'btn btn-sm btn-warning border-0 py-1 shadow-sm';
+                icon.className = 'bi bi-star-fill text-white';
+                toastNotify("تمت الإضافة للشواهد المميزة ⭐");
+            } else {
+                btn.className = 'btn btn-sm btn-light border-0 py-1';
+                icon.className = 'bi bi-star text-warning';
+                toastNotify("تمت الإزالة من التميز");
+            }
+            refreshFeaturedList(); // تحديث الجدول السفلي فقط
+        }
+    } catch (err) {
+        icon.className = originalIconClass;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// دالة تنبيه صغيرة (بسيطة وأنيقة)
+function toastNotify(msg) {
+    Swal.fire({
+        text: msg,
+        target: '#adminDashboard',
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-start'
+    });
+}
+async function refreshFeaturedList() {
+    const body = document.getElementById('featuredTableBody');
+    if (!body) return;
+
+    // حالة التحميل
+    body.innerHTML = '<tr><td colspan="5" class="text-center p-4"><div class="spinner-border spinner-border-sm text-warning"></div> جاري تحميل التميز...</td></tr>';
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getFeaturedFiles" })
+        });
+
+        const result = await response.json();
+        const list = result.featuredList || [];
+
+        body.innerHTML = ''; // تفريغ الجدول
+
+        if (list.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="text-center p-5 text-muted"><i class="bi bi-star d-block fs-2 mb-2 opacity-25"></i>لا توجد شواهد مميزة حالياً</td></tr>';
+            return;
+        }
+
+        list.forEach(item => {
+            body.innerHTML += `
+                <tr class="align-middle">
+                    <td class="text-end fw-bold py-3 text-dark" style="font-size: 0.85rem;">
+                        <i class="bi bi-person-check text-warning ms-2"></i>${item.fullName}
+                    </td>
+                    <td><span class="badge bg-warning bg-opacity-10 text-dark border border-warning-subtle fw-normal">${item.category}</span></td>
+                    <td>
+                        <div class="text-truncate text-muted" style="max-width: 150px; font-size: 0.8rem;" title="${item.fileName}">
+                             ${item.fileName}
+                        </div>
+                    </td>
+                    <td><small class="text-muted font-monospace">${item.date}</small></td>
+                    <td class="text-center">
+                        <div class="btn-group shadow-sm border rounded-2">
+                           <a href="https://drive.google.com/file/d/${item.fileId}/view" 
+                              target="_blank" 
+                              class="btn btn-sm btn-white border-0 py-1" 
+                              title="عرض">
+                              <i class="bi bi-eye text-primary"></i>
+                            </a>
+                            
+                            <button onclick="deleteFromFeatured('${item.fileId}')" 
+                                    class="btn btn-sm btn-white border-0 py-1" 
+                                    title="حذف من التميز">
+                                <i class="bi bi-trash text-danger"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+    } catch (error) {
+        console.error("Error:", error);
+        body.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-danger">❌ فشل تحميل القائمة</td></tr>';
+    }
+}
+
+async function viewStaff(username, fullName) {
+    // إذا اختار الأدمن الخيار الفارغ "اختر موظفاً" لا نفعل شيئاً
+    if (!username || username === "") return;
+
+    const tableBody = document.getElementById('staffFilesBody');
+    const nameLabel = document.getElementById('currentStaffName');
+    const countLabel = document.getElementById('staffFilesCount');
+    const modalEl = document.getElementById('staffModal');
+    
+    // 1. عرض الاسم الكامل فوراً في ترويسة المودال
+    nameLabel.textContent = fullName; 
+    countLabel.textContent = "جاري التحميل...";
+    
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="3" class="text-center p-5">
+                <div class="spinner-grow text-primary" role="status"></div>
+                <div class="mt-2 small text-muted">جاري استرجاع سجلات الموظف...</div>
+            </td>
+        </tr>`;
+
+    // 2. إظهار المودال (باستخدام Bootstrap 5)
+    const myModal = new bootstrap.Modal(modalEl);
+    myModal.show();
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ 
+                action: "getStaffFiles", 
+                targetUsername: username 
+            })
+        });
+
+        const result = await response.json();
+        const files = result.staffFiles || [];
+        
+        tableBody.innerHTML = '';
+        countLabel.textContent = `${files.length} ملف`;
+
+        if (files.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center p-5 text-muted">لا توجد شواهد مرفوعة حالياً</td></tr>';
+            return;
+        }
+
+        // 3. بناء الجدول مع تمرير fullName لكل ملف لضمان دقة "التميز"
+        files.forEach(f => {
+            f.fullName = fullName; 
+            const fileData = JSON.stringify(f).replace(/"/g, '&quot;');
+            
+            const btnClass = f.isFeatured ? 'btn-warning text-white' : 'btn-outline-light text-warning border-warning-subtle';
+            const iconClass = f.isFeatured ? 'bi-star-fill' : 'bi-star';
+            
+            tableBody.innerHTML += `
+                <tr class="align-middle">
+                    <td class="ps-4"><span class="badge bg-primary bg-opacity-10 text-primary border px-2 fw-normal small">${f.category}</span></td>
+                    <td><div class="text-dark small fw-medium text-truncate" style="max-width: 220px;" title="${f.fileName}"><i class="bi bi-file-earmark-text me-1"></i> ${f.fileName}</div></td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                            <a href="https://drive.google.com/file/d/${f.fileId}/view" target="_blank" class="btn btn-sm btn-white border-0 px-3"><i class="bi bi-eye-fill text-primary"></i></a>
+                            <button id="btn_modal_${f.fileId}" onclick="markAsFeatured(${fileData}, 'btn_modal_${f.fileId}')" class="btn btn-sm border-0 px-3 ${btnClass}"><i class="bi ${iconClass}"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+    } catch (error) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-center p-5 text-danger small">❌ فشل تحميل البيانات</td></tr>';
+    }
+}
+
+async function populateUserSelect() {
+    const userSel = document.getElementById('userSel');
+    if (!userSel) return;
+
+    // وضع خيار مؤقت أثناء التحميل
+    userSel.innerHTML = '<option value="">جاري تحميل قائمة الموظفين...</option>';
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getUsers" })
+        });
+
+        const result = await response.json();
+
+        // التأكد من نجاح العملية والوصول للمصفوفة داخل result.users
+        if (result.status === "success" && result.users) {
+            userSel.innerHTML = '<option value="">-- اختر موظفاً لاستعراض شواهده --</option>';
+            
+            result.users.forEach(user => {
+                let opt = document.createElement('option');
+                // القيمة هي username لكي تتعرف عليها دالة viewStaff
+                opt.value = user.username; 
+                // النص المعروض هو الاسم الكامل مع الدور (اختياري لجمالية العرض)
+                opt.textContent = `${user.fullName} (${user.role})`;
+                userSel.appendChild(opt);
+            });
+        } else {
+            throw new Error(result.message || "فشل في جلب البيانات");
+        }
+
+    } catch (error) {
+        console.error("Error populating users:", error);
+        userSel.innerHTML = '<option value="">❌ فشل تحميل الموظفين</option>';
+    }
+}
+async function deleteFromFeatured(fileId) {
+  // 1. طلب تأكيد من المستخدم قبل الحذف
+  const confirmResult = await Swal.fire({
+    title: 'هل أنت متأكد؟',
+    text: "سيتم إزالة هذا الملف من قائمة التميز!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، احذفه',
+    cancelButtonText: 'إلغاء'
+  });
+
+  // 2. التحقق إذا وافق المستخدم
+  if (confirmResult.isConfirmed) {
+    try {
+      // إظهار حالة تحميل بسيطة أثناء الطلب
+      Swal.showLoading();
+
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        // ملاحظة: Google Apps Script يتطلب أحياناً إرسال البيانات كـ Text/Plain لتجنب مشاكل CORS مع POST
+        body: JSON.stringify({
+          action: "deleteFromFeatured",
+          fileId: fileId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        Swal.fire('تم الحذف!', result.message, 'success');
+
+        // حذف الصف من الواجهة فوراً
+        const btnElement = document.getElementById('btn_modal-' + fileId);
+        if (btnElement) {
+          btnElement.style.transition = "all 0.5s ease";
+          btnElement.style.opacity = "0";
+          setTimeout(() => {
+            btnElement.remove();
+            // تحديث القائمة اختيارياً بعد الحذف الفعلي للعنصر
+            if (typeof refreshFeaturedList === "function") refreshFeaturedList();
+          }, 500);
+        } else {
+           if (typeof refreshFeaturedList === "function") refreshFeaturedList();
+        }
+
+      } else {
+        Swal.fire('خطأ', result.message, 'error');
+      }
+
+    } catch (err) {
+      Swal.fire('فشل الاتصال', 'حدث خطأ في الاتصال بالسيرفر: ' + err.message, 'error');
+    }
+  }
+}
+async function updateAdvCatList() {
+    const sel = document.getElementById('advUserSel');
+    if (!sel || sel.selectedIndex === -1) return;
+
+    const selectedOption = sel.options[sel.selectedIndex];
+    const role = selectedOption.getAttribute('data-role'); 
+    const catSel = document.getElementById('advCatSel');
+    
+    // تصفير النتائج السابقة وإخفاء منطقة النتائج
+    const resultsDiv = document.getElementById('advSearchResults');
+    if (resultsDiv) resultsDiv.classList.add('hidden');
+
+    // إذا لم يتم اختيار موظف أو الموظف ليس له دور
+    if (!role) {
+        catSel.innerHTML = '<option value="">-- اختر الموظف أولاً --</option>';
+        return;
+    }
+
+    catSel.innerHTML = `<option disabled selected>جاري جلب شواهد (${role})...</option>`;
+    
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            // ملاحظة: غيرنا role إلى userRole ليطابق طلب الباك إند (request.userRole)
+            body: JSON.stringify({ 
+                action: "getStructureByRole", 
+                userRole: role 
+            })
+        });     
+        
+        const result = await response.json();
+
+        // الباك إند يرسل النتيجة داخل كائن structure
+        if (result.status === "success" && result.structure) {
+            catSel.innerHTML = '<option value="">-- اختر التصنيف (المجال) --</option>';
+            
+            // نستخدم structure.order التي تحتوي على أسماء التصنيفات مرتبة
+            result.structure.order.forEach(catName => {
+                const opt = document.createElement('option');
+                opt.value = catName; 
+                opt.textContent = catName; 
+                catSel.appendChild(opt);
+            });
+
+            // تخزين التفاصيل (المؤشرات) في متغير عالمي أو كخاصية للعنصر للاستخدام لاحقاً
+            // ستحتاج إليها لملء قائمة المؤشرات (Indicators) عند اختيار التصنيف
+            window.currentStructureDetails = result.structure.details;
+
+        } else {
+            catSel.innerHTML = '<option value="">❌ لا توجد تصنيفات لهذا الدور</option>';
+        }
+    } catch (error) {
+        console.error("Error fetching structure:", error);
+        catSel.innerHTML = '<option value="">❌ خطأ في الاتصال بالسيرفر</option>';
+    }
+}
+async function populateAdvUserSelect() {
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getUsers" }) // يجب أن يتطابق مع شرط الباك إند
+        });
+
+        const result = await response.json();
+        
+        const sel = document.getElementById('advUserSel');
+        if (!sel) return;
+
+        // تنظيف القائمة ووضع الخيار الافتراضي
+        sel.innerHTML = '<option value="">-- اختر الموظف من القائمة --</option>';
+
+        // التحقق من نجاح العملية ووجود بيانات المستخدمين
+        if (result.status === "success" && Array.isArray(result.users)) {
+            
+            result.users.forEach(user => {
+                let opt = document.createElement('option');
+                
+                // القيمة: username (من العمود الأول في الشيت)
+                opt.value = user.username; 
+                
+                // النص المعروض: الاسم الكامل (من العمود الثاني) + الدور (من العمود الثالث)
+                const name = user.fullName || user.username;
+                const role = user.role || "بدون دور";
+                opt.textContent = `${name} (${role})`;
+                
+                // إضافة سمات إضافية (اختياري) لاستخدامها في الفلترة لاحقاً
+                opt.setAttribute('data-role', role);
+                
+                sel.appendChild(opt);
+            });
+            
+        } else {
+            console.error("خطأ من السيرفر:", result.message);
+            // Swal.fire('خطأ', result.message || 'فشل في جلب قائمة الموظفين', 'error');
+        }
+
+    } catch (err) {
+        console.error("خطأ في الاتصال:", err);
+    }
+}
+
+async function searchByUserAndCat() {
+    const user = document.getElementById('advUserSel').value;
+    const cat = document.getElementById('advCatSel').value;
+    const resBody = document.getElementById('advResBody');
+    const resultsDiv = document.getElementById('advSearchResults');
+    const countBadge = document.getElementById('resultCount');
+
+    // استخراج الاسم الكامل للموظف من القائمة المنسدلة لعرضه في التميز لاحقاً
+    const fullName = document.getElementById('advUserSel').options[document.getElementById('advUserSel').selectedIndex].text;
+
+    if (!user || !cat) {
+        Swal.fire('تنبيه', "يرجى اختيار اسم الموظف والشاهد المراد البحث فيه", 'info');
+        return;
+    }
+
+    // تهيئة الواجهة - استخدام خلفية ناعمة للهيكل الوهمي
+    resBody.innerHTML = `
+    <tr class="placeholder-glow">
+        <td><div class="placeholder col-10 py-3 rounded-2 shadow-sm mb-1"></div></td>
+        <td><div class="placeholder col-4 py-3 rounded-2 shadow-sm"></div></td>
+    </tr>`.repeat(3);
+    
+    resultsDiv.classList.remove('hidden');
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getUserFiles", user: user })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            resBody.innerHTML = '';
+            
+            const filtered = result.filteredFiles.filter(f => {
+                const rowCat = f.category ? String(f.category).trim() : "";
+                return rowCat === cat.trim();
+            });
+
+            countBadge.textContent = filtered.length + ' ملف';
+
+            if (filtered.length === 0) {
+                resBody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted bg-light rounded-bottom">لم نجد ملفات مرفوعة لهذا الشاهد حالياً</td></tr>';
+                return;
+            }
+
+            // عرض النتائج في الجدول مع الخلفية المحسنة
+            filtered.forEach(f => {
+                // ربط الاسم الكامل للموظف بالملف لضمان دقة "التميز"
+                f.fullName = fullName;
+                const fileData = JSON.stringify(f).replace(/"/g, '&quot;');
+                
+                resBody.innerHTML += `
+                    <tr class="align-middle border-bottom-0">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 shadow-sm">
+                                    <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">${f.fileName || 'ملف بدون اسم'}</div>
+                                    <div class="badge bg-light text-secondary border fw-normal" style="font-size: 0.7rem;">
+                                        <i class="bi bi-hash"></i> ${f.category}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white border">
+                                <a href="${f.viewLink}" target="_blank" class="btn btn-sm btn-light border-0 px-3" title="معاينة">
+                                    <i class="bi bi-eye text-primary"></i> 
+                                </a>
+                                <button onclick="markAsFeatured(${fileData}, 'btn_search_${f.fileId}')"
+                                        id="btn_search_${f.fileId}"
+                                        class="btn btn-sm btn-light border-0 px-3 border-start" title="تميز">
+                                    <i class="bi bi-star text-warning"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+
+        } else { throw new Error(result.message); }
+
+    } catch (err) {
+        resBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4">❌ خطأ في النظام: ${err.message}</td></tr>`;
+    }
+}
+
+function filterUserList() {
+    // 1. جلب نص البحث وتحويله لصيغة موحدة
+    const input = document.getElementById('userSearchInput');
+    const filter = input.value.toLowerCase();
+    const select = document.getElementById('userSel');
+    const options = select.options;
+
+    // 2. المرور على كل الخيارات في القائمة
+    for (let i = 1; i < options.length; i++) { // نبدأ من 1 لتجاهل خيار "-- اختر موظفاً --"
+        const txtValue = options[i].text.toLowerCase();
+        
+        if (txtValue.indexOf(filter) > -1) {
+            options[i].style.display = ""; // إظهار إذا كان مطابقاً
+        } else {
+            options[i].style.display = "none"; // إخفاء إذا لم يكن مطابقاً
+        }
+    }
+}
+function filterAdvUserList() {
+    const input = document.getElementById('advUserSearchInput');
+    const filter = input.value.toLowerCase();
+    const select = document.getElementById('advUserSel');
+    const options = select.options;
+
+    for (let i = 1; i < options.length; i++) {
+        const txtValue = options[i].text.toLowerCase();
+        // إظهار الخيار إذا كان يحتوي على نص البحث
+        if (txtValue.indexOf(filter) > -1) {
+            options[i].style.display = "";
+        } else {
+            options[i].style.display = "none";
+        }
+    }
+}
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
