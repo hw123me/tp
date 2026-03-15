@@ -7,61 +7,40 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <nav
-      class="navbar navbar-dark custom-navbar mb-4 shadow-sm py-3"
-      style="
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        border-bottom: 3px solid #ffc107;
-      "
-    >
-      <div class="container d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3 order-1">
-          <div
-            class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm border border-2 border-white"
-            style="width: 50px; height: 50px; min-width: 50px"
-          >
-            <i class="bi bi-collection-fill fs-4"></i>
-          </div>
-          <div class="text-white">
-            <h5 class="fw-bold mb-0" style="letter-spacing: 0.5px">
-              إدارة الشواهد التعليمية
-            </h5>
-            <div
-              class="d-none d-md-block"
-              style="font-size: 0.75rem; opacity: 0.85"
-            >
-              مجمع الإمام يعقوب البصري وأبو عمرو البصري
+   <nav class="navbar navbar-dark mb-4 shadow-sm py-2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-bottom: 3px solid #ffc107;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center w-100 flex-nowrap">
+            
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                     style="width: 38px; height: 38px; min-width: 38px;">
+                    <i class="bi bi-collection-fill fs-5"></i>
+                </div>
+                <div class="text-white">
+                    <h6 class="fw-bold mb-0 text-nowrap" style="font-size: 0.85rem; @media (min-width: 768px) { font-size: 1.1rem; }">
+                        <span class="d-md-inline">إدارة الشواهد</span>
+                    </h6>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="d-flex align-items-center gap-2 order-2">
-          <div
-            id="userInfoContainer"
-            class="hidden align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-white border-opacity-25"
-          >
-            <div
-              class="text-white me-3 d-flex flex-column text-end cursor-pointer"
-              onclick="openEditProfile()"
-              style="cursor: pointer"
-            >
-              <span class="small opacity-75" style="font-size: 0.65rem"
-                >مرحباً بك</span
-              >
-              <span id="userInfo" class="fw-bold small"></span>
+            <div id="userInfoContainer" class="d-flex align-items-center ms-2">
+                <div class="d-flex align-items-center bg-white bg-opacity-10 rounded-pill p-1 border border-white border-opacity-25 shadow-sm">
+                    
+                    <div class="text-white mx-2 d-flex flex-column text-end cursor-pointer" onclick="openEditProfile()" style="max-width: 100px; overflow: hidden;">
+                        <span class="d-none d-md-inline opacity-75" style="font-size: 0.6rem;">مرحباً بك</span>
+                        <span id="userInfo" class="fw-bold text-truncate" style="font-size: 0.75rem;"></span>
+                    </div>
+
+                    <button onclick="handleLogout()" class="btn btn-sm btn-light rounded-circle shadow-sm text-danger d-flex align-items-center justify-content-center" 
+                            style="width: 32px; height: 32px; min-width: 32px;">
+                        <i class="bi bi-power"></i>
+                    </button>
+                </div>
             </div>
-            <button
-              onclick="handleLogout()"
-              class="btn btn-sm btn-light rounded-circle shadow-sm text-danger d-flex align-items-center justify-content-center"
-              style="width: 32px; height: 32px"
-              title="تسجيل الخروج"
-            >
-              <i class="bi bi-power"></i>
-            </button>
-          </div>
+
         </div>
-      </div>
-    </nav>
+    </div>
+</nav>
 
     <div id="mainDashboard" class="container py-4">
      <div id="progressSection" class="mx-auto mb-4 p-4 shadow-lg rounded-4 hidden" 
