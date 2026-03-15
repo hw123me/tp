@@ -84,25 +84,25 @@
 
 
       <h5 class="text-primary fw-bold mt-2"><i class="bi bi-person-search"></i> آخر الشواهد المرفوعة </h5>
-
-      <div class="card p-0 mt-3 overflow-hidden shadow-sm border-0">
-        <table class="table table-sm table-striped small mb-0">
-          <thead class="blue-gradient-header">
-            <tr>
-              <th>الموظف</th>
-              <th>الشاهد</th>
-              <th>الملف</th>
-              <th>عرض</th>
-            </tr>
-          </thead>
-          <tbody id="recentFilesBody">
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-5 border-top pt-2">
-
-      </div>
+     
+      <div class="card p-0 mt-3 shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-sm table-striped small mb-0 text-nowrap">
+      <thead class="blue-gradient-header">
+        <tr>
+          <th>الموظف</th>
+          <th>الشاهد</th>
+          <th>الملف</th>
+          <th>عرض</th>
+        </tr>
+      </thead>
+      <tbody id="recentFilesBody">
+        </tbody>
+    </table>
+  </div>
+</div>
+     
+      
 
       <div class="card mb-4 shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-middle">
@@ -677,11 +677,14 @@ async function getRecentFiles() {
                     </td>
                     <td>
                      <div class="d-flex align-items-center justify-content-center text-muted" style="font-size: 0.8rem;">
-                            <i class="bi bi-link-45deg ms-1"></i>
-                            <span class="text-truncate" style="max-width: 120px;" title="${f.fileName}">
-                                ${displayFileName}
-                            </span>
-                        </div>
+                        <i class="bi bi-link-45deg ms-1"></i>
+                        <span class="text-truncate d-inline-block" 
+                            style="max-width: 120px; vertical-align: middle; cursor: help;" 
+                            data-bs-toggle="tooltip" 
+                            title="${f.fileName}">
+                            ${displayFileName}
+                        </span>
+                    </div>
                     </td>
                     <td class="text-center">
                         <div class="btn-group shadow-sm border rounded-2 bg-white">
@@ -911,9 +914,12 @@ async function refreshFeaturedList() {
                     </td>
                     <td><span class="badge bg-warning bg-opacity-10 text-dark border border-warning-subtle fw-normal">${item.category}</span></td>
                     <td>
-                        <div class="text-truncate text-muted" style="max-width: 150px; font-size: 0.8rem;" title="${item.fileName}">
-                             ${item.fileName}
-                        </div>
+                        <div class="text-truncate text-muted d-inline-block" 
+                        style="max-width: 150px; font-size: 0.8rem; vertical-align: middle; cursor: help;" 
+                        data-bs-toggle="tooltip" 
+                        title="${item.fileName}">
+                        ${item.fileName}
+                    </div>
                     </td>
                     <td><small class="text-muted font-monospace">${item.date}</small></td>
                     <td class="text-center">
@@ -997,7 +1003,15 @@ async function viewStaff(username, fullName) {
             tableBody.innerHTML += `
                 <tr class="align-middle">
                     <td class="ps-4"><span class="badge bg-primary bg-opacity-10 text-primary border px-2 fw-normal small">${f.category}</span></td>
-                    <td><div class="text-dark small fw-medium text-truncate" style="max-width: 220px;" title="${f.fileName}"><i class="bi bi-file-earmark-text me-1"></i> ${f.fileName}</div></td>
+                    <td>
+                        <div class="text-dark small fw-medium text-truncate d-inline-block align-middle" 
+                            style="max-width: 220px; cursor: help;" 
+                            data-bs-toggle="tooltip" 
+                            title="${f.fileName}">
+                            <i class="bi bi-file-earmark-text me-1 text-primary"></i> 
+                            ${f.fileName}
+                        </div>
+                    </td>
                     <td class="text-end pe-4">
                         <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
                             <a href="https://drive.google.com/file/d/${f.fileId}/view" target="_blank" class="btn btn-sm btn-white border-0 px-3"><i class="bi bi-eye-fill text-primary"></i></a>
@@ -1265,7 +1279,12 @@ async function searchByUserAndCat() {
                                     <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">${f.fileName || 'ملف بدون اسم'}</div>
+                                    <div class="fw-bold text-dark mb-0 text-truncate d-block" 
+                                        style="font-size: 0.95rem; max-width: 250px; cursor: help;" 
+                                        data-bs-toggle="tooltip" 
+                                        title="${f.fileName || 'ملف بدون اسم'}">
+                                        ${f.fileName || 'ملف بدون اسم'}
+                                    </div>
                                     <div class="badge bg-light text-secondary border fw-normal" style="font-size: 0.7rem;">
                                         <i class="bi bi-hash"></i> ${f.category}
                                     </div>

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>لوحة التحكم - إدارة الشواهد</title>
     <link rel="stylesheet" href="style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+
   </head>
   <body>
     <nav class="navbar navbar-dark custom-navbar mb-4 shadow-sm py-2 py-md-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-bottom: 3px solid #ffc107;">
@@ -348,7 +350,20 @@
       }
 
       async function deleteFile(fileId, btnElement) {
-        if (!confirm("هل تريد حذف هذا الملف؟")) return;
+        const result = await Swal.fire({
+            title: 'تأكيد الحذف',
+            text: 'هل تريد حذف هذا الملف حقاً؟',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'نعم، احذف',
+            cancelButtonText: 'إلغاء',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+        });
+
+    // هذا هو السطر البديل لـ "if (!confirm) return"
+    if (!result.isConfirmed) return;
+        
         btnElement.disabled = true;
         btnElement.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
 
@@ -456,5 +471,6 @@
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>
 </html>

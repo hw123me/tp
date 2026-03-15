@@ -195,3 +195,13 @@ body {
     50% { background-color: #f0f7ff; }
     100% { background-color: #fafbfc; }
 }
+.table-responsive::-webkit-scrollbar {
+    height: 5px; /* ارتفاع شريط التمرير العرضي */
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #1e3c72; /* لون المقبض - نفس لون الهيدر لديك */
+    border-radius: 10px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1; /* لون المسار */
+}
