@@ -9,37 +9,36 @@
      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-dark custom-navbar mb-4 shadow-sm py-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-bottom: 3px solid #ffc107;">
+  <nav class="navbar navbar-dark custom-navbar mb-4 shadow-sm py-2 py-md-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-bottom: 3px solid #ffc107;">
     <div class="container d-flex justify-content-between align-items-center">
         
-        <div class="d-flex align-items-center gap-3 order-1">
+        <div class="d-flex align-items-center gap-2 gap-md-3 order-1">
             <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm border border-2 border-white"
-                 style="width: 50px; height: 50px; min-width: 50px;">
-                <i class="bi bi-collection-fill fs-4"></i>
+                 style="width: 40px; height: 40px; min-width: 40px; @media (min-width: 768px) { width: 50px; height: 50px; min-width: 50px; }">
+                <i class="bi bi-collection-fill fs-5 fs-md-4"></i>
             </div>
             <div class="text-white">
-                <h5 class="fw-bold mb-0" style="letter-spacing: 0.5px;">إدارة الشواهد التعليمية</h5>
+                <h6 class="fw-bold mb-0" style="font-size: 0.9rem; @media (min-width: 768px) { font-size: 1.25rem; }">إدارة الشواهد</h6>
                 <div class="d-none d-md-block" style="font-size: 0.75rem; opacity: 0.85;">
-                    مجمع الإمام يعقوب البصري وأبو عمرو البصري
+                    مجمع الإمام يعقوب وأبو عمرو البصري
                 </div>
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 order-2">
-            <div id="userInfoContainer" class="hidden align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-white border-opacity-25">
-                <div class="text-white me-3 d-flex flex-column text-end cursor-pointer" onclick="openEditProfile()" style="cursor: pointer;">
-                    <span class="small opacity-75" style="font-size: 0.65rem;">مرحباً بك</span>
-                    <span id="userInfo" class="fw-bold small"></span>
+        <div class="d-flex align-items-center order-2">
+            <div id="userInfoContainer" class="d-none align-items-center bg-white bg-opacity-10 rounded-pill ps-1 pe-2 py-1 border border-white border-opacity-25">
+                <div class="text-white me-2 d-none d-sm-flex flex-column text-end cursor-pointer" onclick="openEditProfile()" style="cursor: pointer;">
+                    <span id="userInfo" class="fw-bold" style="font-size: 0.75rem;"></span>
                 </div>
                 <button onclick="handleLogout()" class="btn btn-sm btn-light rounded-circle shadow-sm text-danger d-flex align-items-center justify-content-center" 
-                        style="width: 32px; height: 32px;" title="تسجيل الخروج">
+                        style="width: 30px; height: 30px; min-width: 30px;" title="تسجيل الخروج">
                     <i class="bi bi-power"></i>
                 </button>
             </div>
         </div>
 
     </div>
-    </nav>
+</nav>
 
     <div id="adminDashboard" class="container mb-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
